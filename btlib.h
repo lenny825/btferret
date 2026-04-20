@@ -147,11 +147,11 @@ int localnode(void);
 
 void mesh_on(void);
 void mesh_off(void);
-void mesh_server(int(*callback)(int,unsigned char*,int));
+void mesh_server(int(*callback)());
 
 int node_server(int clientnode,int(*callback)(int,unsigned char*,int),char endchar);
 
-int notify_ctic(int node,int cticn,int notifyflag,int(*callback)(int,int,unsigned char*,int));
+int notify_ctic(int node,int cticn,int notifyflag,int(*callback)());
 
 int output_file(char *filemame);
 

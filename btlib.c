@@ -3767,11 +3767,11 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
     NPRINT "Cannot start a second server\n");
     return(0);
     }
-     
+
   mesh_on();   
-  oldkm = setkeymode(1); 
+  oldkm = setkeymode(0); 
   dp = dev[0];
-  
+
   NPRINT "Listening for LE clients to connect ");
   if(gpar.keytocb == 0)
     {
@@ -3783,7 +3783,7 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
     gpar.exitchar = 27;
     NPRINT "(ESC=stop server)\n");
     }
-    
+
   if((gpar.hidflag & 3) == 0)
     badd = dev[0]->baddr;
   else
@@ -3793,7 +3793,7 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
     NPRINT "Advertising as %s %s\n",baddstr(badd,0),dev[0]->name);
   else
     NPRINT "Advertising as %s HID device\n",baddstr(badd,0));
-    
+
   flushprint();
   ndevice = 0;
 
@@ -3802,7 +3802,7 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
 #else
   gpar.lecallback = callback;
 #endif
-  
+
   gpar.serveractive = 1;
 
   tim0 = time_ms();
@@ -3813,7 +3813,7 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
     loopt = 10;
     timms *= 100;
     }
-  
+
   serverexit(1);  
   retval = SERVER_CONTINUE;  
   do
@@ -3823,6 +3823,7 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
     cbflag = 0;  // callback not called
           
     n = findhci(IN_LECMD,0,INS_POP);
+
     if(n >= 0)
       {   
       ndevice = instack[n+3];
@@ -3903,11 +3904,12 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
         tim0 = time_ms();
         }
       }
-      
+
     flushprint();
     popins();
-    key = readkey();
- 
+    key = 'x';
+    // key = readkey();
+
     if(key > 0 && gpar.keytocb != 0)  
       {
       if(key == 27)  
@@ -3927,9 +3929,9 @@ int le_server(int(*callback)(int clientnode,int operation,int cticn),int timerds
         }
       }  
     }
-  while((retval & SERVER_CONTINUE) != 0 && key != 'x');
+  while((retval & SERVER_CONTINUE) != 0);
   serverexit(0);
-  
+
   setkeymode(oldkm);
   gpar.serveractive = 0;
      
@@ -15413,6 +15415,7 @@ int setkeymode(int setflag)
 
 int readkey()
   {
+    VPRINT "IN READ KEY\n");
   static unsigned char keystack[1024];
   static int stn = 0;
   unsigned char c;
